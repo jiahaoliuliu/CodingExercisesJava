@@ -1,10 +1,6 @@
 package com.pramp.string;
 
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -76,55 +72,32 @@ public class DecodeVariations {
      * # < 9 -> 1
      *  Zero -> Is not a problem
      * String -> Int = Integer.parseInt(String)
-
+     * Time complexity: O(2^N)
+     * Space complexity: O(N) because it holds one variable per recursion
      */
     static int decodeVariations(String codedWord) {
-        return helper(codedWord, 0, new ArrayList<>());
+        return helper(codedWord, 0);
     }
 
-    static int helper(String codedWord, int left, List<String> combinations) {
+    static int helper(String codedWord, int left) {
         if (left >= codedWord.length()) {
-            if (isCombinationValid(combinations)) {
-                return 1;
-            } else {
-                return 0;
-            }
+            return 1;
         }
 
         // One item
         // The pass does not matter
-        List<String> oneItemCombination = new ArrayList<>(combinations);
         String nextChar = codedWord.substring(left, left+1);
         // No more combination is possible
-        int oneItemSum = nextChar.equals("0") ? 0 : helper(codedWord, left+1, oneItemCombination);
+        int oneItemSum = nextChar.equals("0") ? 0 : helper(codedWord, left+1);
 
         // Two item
         if (left <= codedWord.length() - 2) {
             String nextTwoChars = codedWord.substring(left, left+2);
             int nextTwoCharsAsInt = Integer.parseInt(nextTwoChars);
-            return oneItemSum + (nextTwoCharsAsInt < 10 || nextTwoCharsAsInt > 27 ? 0 :  helper(codedWord, left+2, combinations));
+            return oneItemSum + (nextTwoCharsAsInt < 10 || nextTwoCharsAsInt > 26 ? 0 :  helper(codedWord, left+2));
         }
 
         return oneItemSum;
-    }
-
-    static boolean isCombinationValid(List<String> combinations) {
-        for (int i = 0; i < combinations.size(); i++) {
-            String currentCombination = combinations.get(i);
-            if (currentCombination.length() == 1) {
-                if (currentCombination.equals("0")) {
-                    return false;
-                }
-            }
-
-            if (currentCombination.length() == 2) {
-                int number = Integer.parseInt(currentCombination);
-                if (number < 10 || number > 26) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     @Test
@@ -149,6 +122,7 @@ public class DecodeVariations {
 
         // Then
         assertEquals(3, combinations);
+        System.out.println("a");
     }
 
     @Test
@@ -177,5 +151,40 @@ public class DecodeVariations {
         // Then
         assertEquals(1, combinations);
     }
+
+    @Test
+    public void test5() {
+        // Given
+        String input = "1263";
+        // <1, 2, 6, 3> valid
+        // <12, 6, 3>   valid
+        // <12, 63>     No valid
+        // <1, 26, 3>   Valid
+        // <1, 2, 63>   No valid
+        // When
+        int combinations = decodeVariations(input);
+
+        // Then
+        assertEquals(3, combinations);
+    }
+
+    @Test
+    public void test6() {
+        // Given
+        String input = "127";
+        // <1, 2, 7> valid
+        // <12, 7>   valid
+        // <1, 27>   No valid
+        // When
+        int combinations = decodeVariations(input);
+
+        // Then
+        assertEquals(2, combinations);
+    }
+
+    static int decodeVariationsDynamicProgramming(String codedWord) {
+        return helper(codedWord, 0);
+    }
+
 
 }
