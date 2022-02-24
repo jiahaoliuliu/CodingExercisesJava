@@ -3,11 +3,9 @@ package com.pramp.string;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Decode Variations
@@ -81,10 +79,10 @@ public class DecodeVariations {
 
      */
     static int decodeVariations(String codedWord) {
-        return helper(codedWord, 0, new ArrayList<>(), 0);
+        return helper(codedWord, 0, new ArrayList<>());
     }
 
-    static int helper(String codedWord, int left, List<String> combinations, int tmpSum) {
+    static int helper(String codedWord, int left, List<String> combinations) {
         if (left >= codedWord.length()) {
             if (isCombinationValid(combinations)) {
                 return 1;
@@ -95,24 +93,28 @@ public class DecodeVariations {
 
         // One item
         List<String> oneItemCombination = new ArrayList<>(combinations);
+        // TODO: Do the check here
         oneItemCombination.add(codedWord.substring(left, left+1));
 
-        tmpSum += helper(codedWord, left+1, oneItemCombination, tmpSum);
+        int oneItemSum = helper(codedWord, left+1, oneItemCombination);
 
         // Two item
-        if (left < codedWord.length() - 2) {
+        if (left <= codedWord.length() - 2) {
             combinations.add(codedWord.substring(left, left+2));
-            tmpSum += helper(codedWord, left+2, combinations, tmpSum);
+            // TODO: Do the check here
+            return oneItemSum + helper(codedWord, left+2, combinations);
         }
 
-        return tmpSum;
+        return oneItemSum;
     }
 
     static boolean isCombinationValid(List<String> combinations) {
         for (int i = 0; i < combinations.size(); i++) {
             String currentCombination = combinations.get(i);
             if (currentCombination.length() == 1) {
-                return !currentCombination.equals("0");
+                if (currentCombination.equals("0")) {
+                    return false;
+                }
             }
 
             if (currentCombination.length() == 2) {
@@ -128,7 +130,19 @@ public class DecodeVariations {
     @Test
     public void test1() {
         // Given
-        String input = "1263";
+        String input = "12";
+
+        // When
+        int combinations = decodeVariations(input);
+
+        // Then
+        assertEquals(2, combinations);
+    }
+
+    @Test
+    public void test2() {
+        // Given
+        String input = "123";  // <1, 2, 3> <12, 3> <1, 23>
 
         // When
         int combinations = decodeVariations(input);
@@ -136,4 +150,32 @@ public class DecodeVariations {
         // Then
         assertEquals(3, combinations);
     }
+
+    @Test
+    public void test3() {
+        // Given
+        String input = "1223";  // <1, 2, 2, 3>  <12, 2, 3> <12, 23>  <1, 22, 3> <1, 2, 23>
+
+        // When
+        int combinations = decodeVariations(input);
+
+        // Then
+        assertEquals(5, combinations);
+    }
+
+    @Test
+    public void test4() {
+        // Given
+        String input = "1203";  // <1, 2, 0, 3> No valid
+                                // <12, 0, 3>   No valid
+                                // <12, 03>     No valid
+                                // <1, 20, 3>   Valid
+                                // <1, 2, 03>   No valid
+        // When
+        int combinations = decodeVariations(input);
+
+        // Then
+        assertEquals(1, combinations);
+    }
+
 }
