@@ -92,17 +92,17 @@ public class DecodeVariations {
         }
 
         // One item
+        // The pass does not matter
         List<String> oneItemCombination = new ArrayList<>(combinations);
-        // TODO: Do the check here
-        oneItemCombination.add(codedWord.substring(left, left+1));
-
-        int oneItemSum = helper(codedWord, left+1, oneItemCombination);
+        String nextChar = codedWord.substring(left, left+1);
+        // No more combination is possible
+        int oneItemSum = nextChar.equals("0") ? 0 : helper(codedWord, left+1, oneItemCombination);
 
         // Two item
         if (left <= codedWord.length() - 2) {
-            combinations.add(codedWord.substring(left, left+2));
-            // TODO: Do the check here
-            return oneItemSum + helper(codedWord, left+2, combinations);
+            String nextTwoChars = codedWord.substring(left, left+2);
+            int nextTwoCharsAsInt = Integer.parseInt(nextTwoChars);
+            return oneItemSum + (nextTwoCharsAsInt < 10 || nextTwoCharsAsInt > 27 ? 0 :  helper(codedWord, left+2, combinations));
         }
 
         return oneItemSum;
