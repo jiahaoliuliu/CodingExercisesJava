@@ -122,7 +122,6 @@ public class DecodeVariations {
 
         // Then
         assertEquals(3, combinations);
-        System.out.println("a");
     }
 
     @Test
@@ -182,9 +181,224 @@ public class DecodeVariations {
         assertEquals(2, combinations);
     }
 
-    static int decodeVariationsDynamicProgramming(String codedWord) {
-        return helper(codedWord, 0);
+    static int decodeVariationsDP(String codedWord) {
+        // Bottom-up approach
+        int[] cache = new int[codedWord.length() + 1];
+        cache[0] = 1; // The first element of the codeWord. It cannot start with 0, so it must be 1
+        cache[1] = codedWord.charAt(0) == '0' ? 0 : 1;
+        for (int i = 2; i < codedWord.length(); i++) {
+            // Check for one word combination
+            int oneWordCombination = codedWord.charAt(i) != '0'? 1: 0;
+
+            // Check for two word combination
+            int twoCharInt = Integer.parseInt(codedWord.substring(i-1, i));
+            int twoWordCombination = (twoCharInt > 10 && twoCharInt <= 26)? 1 : 0;
+            cache[i] = cache[i-1] + oneWordCombination + twoWordCombination;
+        }
+
+        return cache[codedWord.length()];
     }
 
+    @Test
+    public void testDecodeVariationsDP1() {
+        // Given
+        String input = "10";
+
+        // When
+        int combinations = decodeVariationsDP(input);
+
+        // Then
+        assertEquals(1, combinations);
+    }
+
+    @Test
+    public void testDecodeVariationsDP2() {
+        // Given
+        String input = "12";
+
+        // When
+        int combinations = decodeVariationsDP(input);
+
+        // Then
+        assertEquals(2, combinations);
+    }
+
+    @Test
+    public void testDecodeVariationsDP3() {
+        // Given
+        String input = "123";  // <1, 2, 3> <12, 3> <1, 23>
+        // When
+        int combinations = decodeVariationsDP(input);
+
+        // Then
+        assertEquals(3, combinations);
+    }
+
+    @Test
+    public void testDecodeVariationsDP4() {
+        // Given
+        String input = "1223";  // <1, 2, 2, 3>  <12, 2, 3> <12, 23>  <1, 22, 3> <1, 2, 23>
+
+        // When
+        int combinations = decodeVariationsDP(input);
+
+        // Then
+        assertEquals(5, combinations);
+    }
+
+    @Test
+    public void testDecodeVariationsDP5() {
+        // Given
+        String input = "1203";  // <1, 2, 0, 3> No valid
+        // <12, 0, 3>   No valid
+        // <12, 03>     No valid
+        // <1, 20, 3>   Valid
+        // <1, 2, 03>   No valid
+        // When
+        int combinations = decodeVariationsDP(input);
+
+        // Then
+        assertEquals(1, combinations);
+    }
+
+    @Test
+    public void testDecodeVariationsDP6() {
+        // Given
+        String input = "1263";
+        // <1, 2, 6, 3> valid
+        // <12, 6, 3>   valid
+        // <12, 63>     No valid
+        // <1, 26, 3>   Valid
+        // <1, 2, 63>   No valid
+        // When
+        int combinations = decodeVariationsDP(input);
+
+        // Then
+        assertEquals(3, combinations);
+    }
+
+    @Test
+    public void testDecodeVariationsDP7() {
+        // Given
+        String input = "127";
+        // <1, 2, 7> valid
+        // <12, 7>   valid
+        // <1, 27>   No valid
+        // When
+        int combinations = decodeVariationsDP(input);
+
+        // Then
+        assertEquals(2, combinations);
+    }
+
+    public static int numWays(String s){
+        int[] cache = new int[s.length() +1];
+        cache[0] = 1;
+        cache[1] = s.charAt(0) == '0' ? 0 : 1;
+        for(int i = 2; i <= s.length(); i++){
+            int singleDigit = Integer.parseInt(s.substring(i-1,i));
+            int twoDigits = Integer.parseInt(s.substring(i-2,i));
+
+            if(singleDigit >= 1){
+                cache[i] += cache[i-1];
+            }
+            if(twoDigits >= 10 && twoDigits <= 26){
+                cache[i] += cache[i-2];
+            }
+        }
+        return cache[s.length()];
+    }
+
+    @Test
+    public void testNumWays1() {
+        // Given
+        String input = "10";
+
+        // When
+        int combinations = numWays(input);
+
+        // Then
+        assertEquals(1, combinations);
+    }
+
+    @Test
+    public void testNumWays2() {
+        // Given
+        String input = "12";
+
+        // When
+        int combinations = numWays(input);
+
+        // Then
+        assertEquals(2, combinations);
+    }
+
+    @Test
+    public void testNumWays3() {
+        // Given
+        String input = "123";  // <1, 2, 3> <12, 3> <1, 23>
+        // When
+        int combinations = numWays(input);
+
+        // Then
+        assertEquals(3, combinations);
+    }
+
+    @Test
+    public void testNumWays4() {
+        // Given
+        String input = "1223";  // <1, 2, 2, 3>  <12, 2, 3> <12, 23>  <1, 22, 3> <1, 2, 23>
+
+        // When
+        int combinations = numWays(input);
+
+        // Then
+        assertEquals(5, combinations);
+    }
+
+    @Test
+    public void testNumWays5() {
+        // Given
+        String input = "1203";  // <1, 2, 0, 3> No valid
+        // <12, 0, 3>   No valid
+        // <12, 03>     No valid
+        // <1, 20, 3>   Valid
+        // <1, 2, 03>   No valid
+        // When
+        int combinations = numWays(input);
+
+        // Then
+        assertEquals(1, combinations);
+    }
+
+    @Test
+    public void testNumWays6() {
+        // Given
+        String input = "1263";
+        // <1, 2, 6, 3> valid
+        // <12, 6, 3>   valid
+        // <12, 63>     No valid
+        // <1, 26, 3>   Valid
+        // <1, 2, 63>   No valid
+        // When
+        int combinations = numWays(input);
+
+        // Then
+        assertEquals(3, combinations);
+    }
+
+    @Test
+    public void testNumWays7() {
+        // Given
+        String input = "127";
+        // <1, 2, 7> valid
+        // <12, 7>   valid
+        // <1, 27>   No valid
+        // When
+        int combinations = numWays(input);
+
+        // Then
+        assertEquals(2, combinations);
+    }
 
 }
